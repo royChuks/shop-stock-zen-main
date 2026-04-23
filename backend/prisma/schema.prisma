@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String @id @default(uuid())
+  email         String @unique
+  passwordHash  String 
+  firstName     String?
+  lastName      String?
+  businessName  String?
+  businessType  String?
+  isActive      Boolean @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+
+  products      Product[]
+  suppliers     Supplier[]
+  orders        Order[]
+  activities    Activity[]
+  alerts        Alert[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([businessName])
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  userId       String
+  name         String
+  sku          String   @unique
+  category     String
+  description  String?
+  quantity     Int      @default(0)
+  reorderPoint Int      @default(10)
+  price        Float
+  cost         Float
+  status       String   @default("healthy")  // healthy, low, critical
+  supplierId   String?
+  lastUpdated  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  user         User      @relation(fields: [userId], references: [id])
+  supplier     Supplier? @relation(fields: [supplierId], references: [id])
+  orderItems   OrderItem[]
+  alerts       Alert[]
+
+  @@index([userId])
+  @@index([sku])
+  @@index([status])
+  @@index([category])
+}
+
+model Supplier {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  contactPerson String?
+  category      String?
+  rating        Int      @default(5)
+  status        String   @default("active")
+  totalOrders   Int      @default(0)
+  lastOrderDate DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  user          User     @relation(fields: [userId], references: [id])
+  products      Product[]
+  orders        Order[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([rating])
+}
+
+model Order {
+  id               String   @id @default(uuid())
+  userId           String
+  orderNumber      String   @unique
+  supplierId       String
+  status           String   @default("pending")
+  totalAmount      Float
+  orderDate        DateTime
+  expectedDelivery DateTime?
+  actualDelivery   DateTime?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  deletedAt        DateTime?
+
+  user             User      @relation(fields: [userId], references: [id])
+  supplier         Supplier  @relation(fields: [supplierId], references: [id])
+  orderItems       OrderItem[]
+
+  @@index([userId])
+  @@index([supplierId])
+  @@index([status])
+  @@index([orderDate])
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Float
+  createdAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  description String?
+  relatedId   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  description String?
+  productId   String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+  product     Product? @relation(fields: [productId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String?
+  type      String?
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+}
+
