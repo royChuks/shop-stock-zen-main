@@ -59,6 +59,147 @@ router.post('/', authenticate, async (req, res, next) => {
   }
 });
 
-// Add GET /:id, PUT /:id, DELETE /:id similarly (I can give you the full file if you want all CRUD at once)
+/**
+ * @openapi
+ * /suppliers/{supplierId}:
+ *   get:
+ *     tags: [Suppliers]
+ *     summary: Get single supplier
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: supplierId
+ *         in: path
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Supplier details
+ */
+router.get('/:supplierId', authenticate, async (req, res, next) => {
+  try {
+    const supplierId = req.params.supplierId as string;
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: supplierId, userId: req.user!.id, deletedAt: null },
+    });
+    if (!supplier) {
+      return res.status(404).json({ error: { code: 'SUPPLIER_NOT_FOUND', message: 'Supplier not found' } });
+    }
+    res.json({
+      ...supplier,
+      lastOrderDate: supplier.lastOrderDate?.toISOString() ?? null,
+      createdAt: supplier.createdAt.toISOString(),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * @openapi
+ * /suppliers/{supplierId}:
+ *   put:
+ *     tags: [Suppliers]
+ *     summary: Update supplier
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: supplierId
+ *         in: path
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               email: { type: string }
+ *               phone: { type: string }
+ *               address: { type: string }
+ *               contactPerson: { type: string }
+ *               category: { type: string }
+ *               rating: { type: integer }
+ *               status: { type: string }
+ *     responses:
+ *       200:
+ *         description: Supplier updated
+ */
+router.put('/:supplierId', authenticate, async (req, res, next) => {
+  try {
+    const supplierId = req.params.supplierId as string;
+
+    const existingSupplier = await prisma.supplier.findUnique({
+      where: { id: supplierId, userId: req.user!.id, deletedAt: null },
+    });
+    if (!existingSupplier) {
+      return res.status(404).json({ error: { code: 'SUPPLIER_NOT_FOUND', message: 'Supplier not found' } });
+    }
+
+    const input = supplierSchema.partial().parse(req.body);
+
+    const supplier = await prisma.supplier.update({
+      where: { id: supplierId },
+      data: input,
+    });
+
+    res.json({
+      ...supplier,
+      lastOrderDate: supplier.lastOrderDate?.toISOString() ?? null,
+      createdAt: supplier.createdAt.toISOString(),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * @openapi
+ * /suppliers/{supplierId}:
+ *   delete:
+ *     tags: [Suppliers]
+ *     summary: Soft delete supplier
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: supplierId
+ *         in: path
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Supplier deleted
+ */
+router.delete('/:supplierId', authenticate, async (req, res, next) => {
+  try {
+    const supplierId = req.params.supplierId as string;
+
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: supplierId, userId: req.user!.id, deletedAt: null },
+    });
+    if (!supplier) {
+      return res.status(404).json({ error: { code: 'SUPPLIER_NOT_FOUND', message: 'Supplier not found' } });
+    }
+
+    // Check for active orders
+    const activeOrders = await prisma.order.count({
+      where: { supplierId, userId: req.user!.id, status: { in: ['pending', 'confirmed', 'shipped'] }, deletedAt: null },
+    });
+    if (activeOrders > 0) {
+      return res.status(400).json({ error: { code: 'SUPPLIER_HAS_ORDERS', message: 'Cannot delete supplier with active orders' } });
+    }
+
+    await prisma.supplier.update({
+      where: { id: supplierId },
+      data: { deletedAt: new Date() },
+    });
+
+    res.json({ message: 'Supplier deleted successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;

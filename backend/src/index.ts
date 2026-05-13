@@ -20,15 +20,15 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 const app : Express = express();
 
 
-// configuration 
+// configuration
 const PORT = Number(process.env.PORT) || 3000
-const CORS_ORIGIN = process.env.CORS_ORIGIN ||   'http://localhost:5173';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:8080';
 
 
 // middleware
 
 app.use(cors({
-    origin:CORS_ORIGIN,
+    origin: CORS_ORIGIN.split(',').map(o => o.trim()),
     credentials: true,
 }));
 
