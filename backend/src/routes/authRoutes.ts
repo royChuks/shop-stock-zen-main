@@ -52,6 +52,15 @@ const loginSchema = z.object({
 router.post('/register', async (req, res, next) => {
   try {
     const data = registerSchema.parse(req.body);
+    
+    // Check database connection first
+    try {
+      await prisma.$connect();
+    } catch (dbErr) {
+      console.error('Database connection error:', dbErr);
+      return res.status(503).json({ error: { code: 'DB_CONNECTION_FAILED', message: 'Database connection failed. Please ensure PostgreSQL is running.' } });
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
       return res.status(409).json({ error: { code: 'USER_EXISTS', message: 'Email already in use' } });
@@ -73,6 +82,7 @@ router.post('/register', async (req, res, next) => {
 
     res.status(201).json({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, businessName: user.businessName, businessType: user.businessType }, token, expiresIn: 86400 });
   } catch (err) {
+    console.error('Register error:', err);
     next(err);
   }
   
