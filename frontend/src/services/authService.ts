@@ -1,90 +1,30 @@
 import type { LoginResponse, SignupResponse, SignupData } from "@/types/auth";
+import { authApi } from "./authApi";
+import { authService as mockAuthService } from "./mockAuthService";
 
-// Mock user database
-const mockUsers: { [key: string]: { password: string; user: LoginResponse["user"]; token: string } } = {
-  "test@example.com": {
-    password: "password123",
-    user: {
-      id: "1",
-      email: "test@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      businessName: "Tech Store",
-      businessType: "Retail",
-    },
-    token: "mock_token_123",
-  },
-};
+const USE_MOCK_MODE = import.meta.env.VITE_USE_MOCK === "true";
 
-const TOKEN_KEY = "auth_token";
-const USER_KEY = "auth_user";
-
-export const authService = {
-  // Login
+export const authService = USE_MOCK_MODE ? mockAuthService : {
   async login(email: string, password: string): Promise<LoginResponse> {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const userRecord = mockUsers[email];
-    if (!userRecord || userRecord.password !== password) {
-      throw new Error("Invalid email or password");
-    }
-
-    const response: LoginResponse = {
-      user: userRecord.user,
-      token: userRecord.token,
-    };
-
-    localStorage.setItem(TOKEN_KEY, response.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-
+    const response = await authApi.login(email, password);
+    localStorage.setItem("auth_token", response.token);
+    localStorage.setItem("auth_user", JSON.stringify(response.user));
     return response;
   },
 
-  // Signup
   async signup(data: SignupData): Promise<SignupResponse> {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    if (mockUsers[data.email]) {
-      throw new Error("Email already registered");
-    }
-
-    if (data.password !== data.confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
-
-    const newUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      businessName: data.businessName,
-      businessType: data.businessType,
-    };
-
-    const token = `mock_token_${Date.now()}`;
-
-    mockUsers[data.email] = {
-      password: data.password,
-      user: newUser,
-      token,
-    };
-
-    const response: SignupResponse = {
-      user: newUser,
-      token,
-    };
-
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-
+    const response = await authApi.register(data);
+    localStorage.setItem("auth_token", response.token);
+    localStorage.setItem("auth_user", JSON.stringify(response.user));
     return response;
   },
 
-  // Get current user from localStorage
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    return authApi.forgotPassword(email);
+  },
+
   getCurrentUser() {
-    const userStr = localStorage.getItem(USER_KEY);
+    const userStr = localStorage.getItem("auth_user");
     if (!userStr) return null;
     try {
       return JSON.parse(userStr);
@@ -93,25 +33,25 @@ export const authService = {
     }
   },
 
-  // Get token
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem("auth_token");
   },
 
-  // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.getToken() && !!this.getCurrentUser();
   },
 
-  // Logout
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
   },
 
-  // Validate token (mock)
   async validateToken(token: string): Promise<boolean> {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    return !!token;
+    try {
+      await authApi.getProfile();
+      return true;
+    } catch {
+      return false;
+    }
   },
 };

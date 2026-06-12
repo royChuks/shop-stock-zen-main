@@ -279,7 +279,7 @@ Vercel provides the easiest deployment experience for React/Vite applications.
    In Vercel dashboard, go to Project Settings > Environment Variables:
 
    ```
-   VITE_API_URL=<your-backend-url>/api/v1
+   VITE_API_URL= http://localhost:3000/api/v1
    ```
 
 **Advantages:**

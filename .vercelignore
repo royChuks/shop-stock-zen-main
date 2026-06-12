@@ -1,0 +1,47 @@
+# Exclude backend source (not needed in deployment)
+backend/src
+backend/prisma
+backend/tsconfig.json
+backend/package.json
+backend/package-lock.json
+backend/.env
+backend/.env.example
+
+# Exclude frontend source (only dist needed)
+frontend/src
+frontend/public
+frontend/*.config.*
+frontend/tsconfig*.json
+frontend/package.json
+frontend/package-lock.json
+frontend/.env*
+frontend/vercel.json
+
+# Exclude root config files not needed
+.git
+.gitignore
+README.md
+.vercelignore
+
+# Node modules
+**/node_modules
+
+# Prisma generated client (will be generated at build time)
+backend/generated
+
+# Build outputs (except frontend/dist which is the output)
+backend/dist
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

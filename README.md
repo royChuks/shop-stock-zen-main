@@ -6,6 +6,7 @@ A full-stack inventory management application designed for small businesses to t
 [![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
@@ -54,8 +55,9 @@ Shop Stock Zen is a modern inventory management system that helps small business
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL 15+
+- PostgreSQL 15+ (or Neon/Supabase for serverless)
 - npm or yarn
+- Vercel CLI (for local development): `npm i -g vercel`
 
 ### 1. Clone the Repository
 
@@ -66,6 +68,12 @@ cd shop-stock-zen
 
 ### 2. Install Dependencies
 
+```bash
+# Install all dependencies (root, frontend, backend)
+npm run install:all
+```
+
+Or individually:
 **Backend:**
 ```bash
 cd backend
@@ -80,58 +88,95 @@ npm install
 
 ### 3. Database Setup
 
+#### Local Development (PostgreSQL)
 1. Create a PostgreSQL database:
 ```sql
 CREATE DATABASE shopstockzen;
 ```
 
-2. Update the `DATABASE_URL` in `backend/.env`:
-```
-DATABASE_URL="postgresql://postgres:your_password@localhost:5432/shopstockzen?schema=public"
-```
-
-3. Run migrations:
-```bash
-cd backend
-npm run prisma:migrate
-```
-
-4. Generate Prisma client:
-```bash
-npm run prisma:generate
-```
-
-### 4. Environment Variables
-
-Create a `.env` file in the `backend` directory:
-
+2. Create `backend/.env`:
 ```env
 DATABASE_URL="postgresql://postgres:your_password@localhost:5432/shopstockzen?schema=public"
 JWT_SECRET="your-super-secret-key-change-in-production"
 PORT=3000
 CORS_ORIGIN=http://localhost:5173,http://localhost:8080
+NODE_ENV=development
 ```
+
+3. Run migrations and generate Prisma client:
+```bash
+cd backend
+npm run prisma:migrate
+npm run prisma:generate
+```
+
+#### Production (Neon/Supabase - Serverless Postgres)
+1. Create a database on [Neon](https://neon.tech) or [Supabase](https://supabase.com)
+2. Get the **pooled connection string** (includes `-pooler` in hostname)
+3. Add as `DATABASE_URL` in Vercel Environment Variables
+
+### 4. Environment Variables
+
+#### Local Development (`backend/.env`)
+```env
+DATABASE_URL="postgresql://postgres:your_password@localhost:5432/shopstockzen?schema=public"
+JWT_SECRET="your-super-secret-key-change-in-production"
+PORT=3000
+CORS_ORIGIN=http://localhost:5173,http://localhost:8080
+NODE_ENV=development
+```
+
+#### Production (Set in Vercel Dashboard)
+| Variable | Value |
+|----------|-------|
+| `DATABASE_URL` | Neon/Supabase pooled connection string |
+| `JWT_SECRET` | Strong random string (32+ chars) |
+| `CORS_ORIGIN` | `https://your-project.vercel.app` |
+| `NODE_ENV` | `production` |
 
 ### 5. Run the Application
 
-**Start Backend:**
+**Local Development (Traditional)**
 ```bash
+# Terminal 1 - Backend
 cd backend
 npm run dev
-```
-The API runs at `http://localhost:3000` with Swagger docs at `http://localhost:3000/api-docs`
 
-**Start Frontend:**
-```bash
+# Terminal 2 - Frontend
 cd frontend
 npm run dev
 ```
-The frontend runs at `http://localhost:5173`
+- API: `http://localhost:3000` (Swagger: `http://localhost:3000/api-docs`)
+- Frontend: `http://localhost:8080`
 
-## Project Structure
+**Local Development (Vercel CLI - Monorepo)**
+```bash
+vercel dev
+```
+- Full stack at `http://localhost:3000` (Vercel proxies frontend + API)
+
+### 6. Deploy to Vercel
+
+1. Push to GitHub
+2. Import project in Vercel Dashboard
+3. Configure:
+   - **Framework Preset**: Vite
+   - **Root Directory**: `./` (repository root)
+   - **Build Command**: `npm run build` (runs frontend build)
+   - **Output Directory**: `frontend/dist`
+4. Add Environment Variables (see table above)
+5. Deploy
+
+The `vercel.json` at root handles routing:
+- `/api/*` → Serverless function (`api/index.ts`)
+- `/*` → Frontend SPA (`frontend/dist/index.html`)
+
+## Project Structure (Vercel Monorepo)
 
 ```
 shop-stock-zen/
+├── api/                      # Vercel serverless entry point
+│   └── index.ts             # Exports Express app for serverless
 ├── frontend/                 # React frontend application
 │   ├── src/
 │   │   ├── components/      # Reusable UI components
@@ -142,20 +187,24 @@ shop-stock-zen/
 │   │   ├── types/           # TypeScript type definitions
 │   │   └── lib/             # Utility functions
 │   ├── package.json
-│   └── vite.config.ts
+│   ├── vite.config.ts       # Vite config with /api proxy
+│   ├── .env.production      # Production env (VITE_API_URL=/api)
+│   └── vercel.json          # Frontend-only config (reference)
 │
 ├── backend/                  # Express.js backend API
 │   ├── src/
 │   │   ├── routes/          # API route handlers
 │   │   ├── middleware/      # Express middleware
-│   │   ├── lib/             # Utilities and helpers
-│   │   ├── index.ts         # Application entry point
-│   │   └── app.ts           # Express app configuration
+│   │   ├── lib/             # Utilities (prisma.ts for serverless)
+│   │   ├── index.ts         # Local dev entry (with app.listen)
+│   │   └── app.ts           # Express app (exported for serverless)
 │   ├── prisma/
 │   │   └── schema.prisma    # Database schema
 │   ├── package.json
 │   └── tsconfig.json
 │
+├── vercel.json              # Root config (monorepo routing)
+├── package.json             # Root scripts (install:all, build, etc.)
 └── README.md
 ```
 
@@ -206,23 +255,35 @@ shop-stock-zen/
 
 ## Scripts
 
-### Backend
+### Root (Monorepo)
 ```bash
-npm run dev              # Start development server with hot reload
-npm run build            # Compile TypeScript
-npm run start            # Start production server
+npm run install:all      # Install all dependencies (root, frontend, backend)
+npm run build            # Build frontend for production
+npm run dev:frontend     # Start frontend dev server
+npm run dev:backend      # Start backend dev server
 npm run prisma:generate  # Generate Prisma client
 npm run prisma:migrate   # Run database migrations
 npm run prisma:seed      # Seed database with sample data
 ```
 
-### Frontend
+### Backend (`cd backend`)
 ```bash
-npm run dev              # Start development server
-npm run build            # Build for production
+npm run dev              # Start development server with hot reload (tsx watch)
+npm run build            # Compile TypeScript to dist/
+npm run start            # Start production server (node dist/index.js)
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:migrate   # Run database migrations
+npm run prisma:seed      # Seed database with sample data
+```
+
+### Frontend (`cd frontend`)
+```bash
+npm run dev              # Start development server (Vite)
+npm run build            # Build for production (outputs to dist/)
+npm run build:dev        # Build for development
 npm run lint             # Run ESLint
 npm run preview          # Preview production build
-npm run test             # Run tests
+npm run test             # Run tests (vitest)
 npm run test:watch       # Run tests in watch mode
 ```
 

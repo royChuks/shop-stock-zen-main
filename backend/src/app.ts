@@ -16,10 +16,16 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 dotenv.config();
 
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3000
 
+app.use(cors({
+    origin: process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || ['http://localhost:5173', 'http://localhost:8080'],
+    credentials: true,
+}));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // swagger setup forn spec 
 const swaggerOptions = {
@@ -65,13 +71,10 @@ const swaggerOptions = {
     });
   });
   
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-  
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-    console.log(`Swagger docs at http://localhost:${port}/api-docs`);
-  });
+  // Health check endpoint (for Vercel health checks)
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Note: app.listen() is handled by Vercel in serverless mode
+// For local development, use backend/src/index.ts

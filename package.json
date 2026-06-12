@@ -1,0 +1,17 @@
+{
+  "name": "shop-stock-zen",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd backend && npm run prisma:generate && cd ../frontend && npm run build",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "prisma:generate": "cd backend && npm run prisma:generate",
+    "prisma:migrate": "cd backend && npm run prisma:migrate",
+    "prisma:seed": "cd backend && npm run prisma:seed"
+  },
+  "devDependencies": {
+    "vercel": "^40.0.0"
+  }
+}
