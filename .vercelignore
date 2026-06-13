@@ -9,7 +9,7 @@
 
 # Build outputs (regenerated during build)
 backend/dist
-backend/generated
+
 
 # Environment files (Vercel dashboard provides env vars)
 **/.env
