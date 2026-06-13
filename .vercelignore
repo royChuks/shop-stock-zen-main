@@ -1,36 +1,28 @@
-# Exclude backend source (not needed in deployment)
-backend/src
-backend/prisma
-backend/tsconfig.json
-backend/package.json
-backend/package-lock.json
-backend/.env
-backend/.env.example
+# ──────────────────────────────────────────────
+# .vercelignore — Monorepo deployment (frontend + backend + API)
+# Unlike .gitignore, this controls which files are uploaded to Vercel.
+# We must keep everything needed for build + serverless runtime.
+# ──────────────────────────────────────────────
 
-# Exclude frontend source (only dist needed)
-frontend/src
-frontend/public
-frontend/*.config.*
-frontend/tsconfig*.json
-frontend/package.json
-frontend/package-lock.json
-frontend/.env*
-frontend/vercel.json
+# Dependencies (Vercel installs these via installCommand)
+**/node_modules
 
-# Exclude root config files not needed
+# Build outputs (regenerated during build)
+backend/dist
+backend/generated
+
+# Environment files (Vercel dashboard provides env vars)
+**/.env
+**/.env.example
+**/.env.local
+**/.env.*.local
+**/.env.production
+
+# Git, docs, meta
 .git
 .gitignore
 README.md
-.vercelignore
-
-# Node modules
-**/node_modules
-
-# Prisma generated client (will be generated at build time)
-backend/generated
-
-# Build outputs (except frontend/dist which is the output)
-backend/dist
+DEPLOYMENT.md
 
 # IDE
 .vscode
@@ -45,3 +37,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Miscellaneous
+.sixth/
