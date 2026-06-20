@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "workspaces": ["frontend", "backend"],
   "scripts": {
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "build": "cd backend && npm run prisma:generate && cd ../frontend && npm exec -- vite build",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
-    "prisma:generate": "cd backend && npm run prisma:generate",
-    "prisma:migrate": "cd backend && npm run prisma:migrate",
-    "prisma:seed": "cd backend && npm run prisma:seed"
+    "install:all": "npm install",
+    "build": "npm run -w backend prisma:generate && npm run -w frontend build",
+    "dev:frontend": "npm run -w frontend dev",
+    "dev:backend": "npm run -w backend dev",
+    "prisma:generate": "npm run -w backend prisma:generate",
+    "prisma:migrate": "npm run -w backend prisma:migrate",
+    "prisma:seed": "npm run -w backend prisma:seed"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

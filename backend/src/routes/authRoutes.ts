@@ -7,6 +7,12 @@ import {prisma} from "../lib/prisma.js"
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is not set. Authentication will fail.');
+  console.error('Set it in Vercel Dashboard → Project → Settings → Environment Variables.');
+}
+
 
 // Validation schemas
 const registerSchema = z.object({
@@ -78,7 +84,10 @@ router.post('/register', async (req, res, next) => {
       },
     });
 
-    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '24h' });
+    if (!JWT_SECRET) {
+      return res.status(500).json({ error: { code: 'CONFIG_ERROR', message: 'JWT_SECRET not configured. Set it in Vercel environment variables.' } });
+    }
+    const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
 
     res.status(201).json({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, businessName: user.businessName, businessType: user.businessType }, token, expiresIn: 86400 });
   } catch (err) {
@@ -115,7 +124,10 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: { code: 'AUTH_INVALID_CREDENTIALS', message: 'Invalid email or password' } });
     }
 
-    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '24h' });
+    if (!JWT_SECRET) {
+      return res.status(500).json({ error: { code: 'CONFIG_ERROR', message: 'JWT_SECRET not configured. Set it in Vercel environment variables.' } });
+    }
+    const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
 
     res.json({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, businessName: user.businessName, businessType: user.businessType }, token, expiresIn: 86400 });
   } catch (err) {
