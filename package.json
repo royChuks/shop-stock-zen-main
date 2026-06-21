@@ -13,5 +13,7 @@
     "prisma:migrate": "npm run -w backend prisma:migrate",
     "prisma:seed": "npm run -w backend prisma:seed"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vite": "^5.4.19"
+  }
 }

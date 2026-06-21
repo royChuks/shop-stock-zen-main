@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node -e \"process.exit(require('child_process').spawnSync('node',[require.resolve('vite/bin/vite.js'),'build'],{cwd:process.cwd(),stdio:'inherit'}).status||0)\"",
+    "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
