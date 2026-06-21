@@ -2,7 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
-  "installCommand": "rm -rf node_modules frontend/node_modules backend/node_modules package-lock.json && npm install",
+  "installCommand": "npm install",
   "rewrites": [
     { "source": "/api/v1/(.*)", "destination": "/api/index.ts" },
     { "source": "/(.*)", "destination": "/index.html" }

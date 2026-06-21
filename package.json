@@ -6,7 +6,7 @@
   "workspaces": ["frontend", "backend"],
   "scripts": {
     "install:all": "npm install",
-    "build": "npm run -w backend prisma:generate && cd frontend && npm exec vite build",
+    "build": "npm run -w backend prisma:generate && cd frontend && node -e \"process.exit(require('child_process').spawnSync('node',[require.resolve('vite/bin/vite.js'),'build'],{cwd:process.cwd(),stdio:'inherit'}).status||0)\"",
     "dev:frontend": "npm run -w frontend dev",
     "dev:backend": "npm run -w backend dev",
     "prisma:generate": "npm run -w backend prisma:generate",
