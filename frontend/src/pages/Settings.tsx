@@ -24,7 +24,7 @@ const Settings = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>First Name</Label>
                 <Input defaultValue="John" />
@@ -49,16 +49,16 @@ const Settings = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
                 <p className="font-medium">Low Stock Alerts</p>
                 <p className="text-sm text-muted-foreground">Get notified when items are low</p>
               </div>
               <Switch defaultChecked />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
                 <p className="font-medium">Order Updates</p>
                 <p className="text-sm text-muted-foreground">Notifications for order status changes</p>
               </div>

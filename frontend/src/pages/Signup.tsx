@@ -107,8 +107,8 @@ export const SignupPage: React.FC = () => {
   const passwordStrength = formData.password.length >= 6 ? "Strong" : formData.password.length >= 3 ? "Medium" : "Weak";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4">
-      <Card className="w-full max-w-md shadow-lg max-h-[90vh] overflow-y-auto">
+    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-3 dark:from-slate-950 dark:to-slate-900 sm:p-4">
+      <Card className="max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto shadow-lg sm:max-h-[90vh]">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
@@ -127,7 +127,7 @@ export const SignupPage: React.FC = () => {
               </Alert>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               <div className="space-y-1">
                 <label htmlFor="firstName" className="text-sm font-medium">
                   First Name

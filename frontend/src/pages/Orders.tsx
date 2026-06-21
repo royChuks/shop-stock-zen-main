@@ -53,7 +53,7 @@ const Orders = () => {
       subtitle="Manage purchase orders and track deliveries."
     >
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4 mb-6">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
@@ -89,20 +89,20 @@ const Orders = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem] lg:flex lg:items-center">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search orders..."
-              className="w-72 pl-9"
+              className="w-full pl-9 lg:w-72"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full lg:w-40">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -115,7 +115,7 @@ const Orders = () => {
             </SelectContent>
           </Select>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2 sm:self-start lg:self-auto">
           <Plus className="h-4 w-4" />
           New Order
         </Button>
@@ -135,26 +135,26 @@ const Orders = () => {
             const StatusIcon = statusConfig[order.status].icon;
             return (
               <Card key={order.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                       <div className={cn("p-3 rounded-lg", statusConfig[order.status].className.replace("text-", "bg-").split(" ")[0])}>
                         <StatusIcon className="h-5 w-5" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                           <h3 className="font-semibold">{order.orderNumber}</h3>
                           <Badge variant="outline" className={statusConfig[order.status].className}>
                             {statusConfig[order.status].label}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="mt-1 truncate text-sm text-muted-foreground">
                           {order.supplier} • {order.items.length} item(s)
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
+                    <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-6">
+                      <div className="text-left sm:text-right">
                         <p className="font-semibold">${order.totalAmount.toLocaleString()}</p>
                         <p className="text-sm text-muted-foreground">
                           Expected: {format(new Date(order.expectedDelivery), "MMM d, yyyy")}
@@ -214,7 +214,7 @@ const Orders = () => {
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm text-muted-foreground">Supplier</p>
                   <p className="font-medium">{selectedOrder.supplier}</p>

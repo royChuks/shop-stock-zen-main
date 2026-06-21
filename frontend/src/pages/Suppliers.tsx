@@ -94,18 +94,18 @@ const Suppliers = () => {
       subtitle="Manage your supplier relationships and contacts."
     >
       {/* Toolbar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div className="relative">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search suppliers..."
-            className="w-72 pl-9"
+            className="w-full pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+        <Button className="gap-2 sm:self-start" onClick={() => setIsAddDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           Add Supplier
         </Button>
@@ -197,7 +197,7 @@ const Suppliers = () => {
             <DialogTitle>{editingSupplier ? "Edit Supplier" : "Add New Supplier"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">Company Name</Label>
                 <Input
@@ -217,7 +217,7 @@ const Suppliers = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -247,7 +247,7 @@ const Suppliers = () => {
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <Select

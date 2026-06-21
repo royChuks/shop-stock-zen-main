@@ -28,7 +28,12 @@ const secondaryNav = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ open = false, onClose }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -42,7 +47,12 @@ export function Sidebar() {
   const displayName = user ? `${user.firstName} ${user.lastName}` : "User";
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar text-sidebar-foreground shadow-sidebar">
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-40 h-dvh w-[min(18rem,85vw)] bg-sidebar text-sidebar-foreground shadow-sidebar transition-transform duration-200 md:h-screen md:w-64 md:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6">
@@ -66,6 +76,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={onClose}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
@@ -91,6 +102,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={onClose}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive

@@ -89,8 +89,8 @@ export function InventoryTableFull({ searchQuery = "", statusFilter = "all", cat
   return (
     <>
       <div className="rounded-xl border border-border bg-card shadow-card animate-fade-in">
-        <div className="flex items-center justify-between border-b border-border p-4">
-          <div>
+        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h3 className="text-lg font-semibold text-foreground">Inventory Items</h3>
             <p className="text-sm text-muted-foreground">
               {filteredItems.length} items {searchQuery && `matching "${searchQuery}"`}
@@ -103,7 +103,7 @@ export function InventoryTableFull({ searchQuery = "", statusFilter = "all", cat
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-[760px] w-full">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => handleSort("name")}>
@@ -199,11 +199,11 @@ export function InventoryTableFull({ searchQuery = "", statusFilter = "all", cat
           </table>
         </div>
 
-        <div className="flex items-center justify-between border-t border-border px-4 py-3">
+        <div className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedItems.length)} of {sortedItems.length} items
           </p>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex">
             <Button 
               variant="outline" 
               size="sm" 

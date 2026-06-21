@@ -57,7 +57,7 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
           <DialogTitle>{mode === "add" ? "Add New Product" : "Edit Product"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Product Name</Label>
               <Input
@@ -80,7 +80,7 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select
@@ -118,7 +118,7 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="quantity">Quantity</Label>
               <Input
@@ -143,7 +143,7 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="price">Selling Price ($)</Label>
               <Input

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, Plus, LogOut, User } from "lucide-react";
+import { Bell, Search, Plus, LogOut, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,9 +23,10 @@ type AddProductData = Omit<InventoryItem, "id" | "status" | "lastUpdated" | "cre
 interface HeaderProps {
   title: string;
   subtitle?: string;
+  onMenuClick?: () => void;
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { addItem } = useInventory();
@@ -45,13 +46,19 @@ export function Header({ title, subtitle }: HeaderProps) {
   const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : "U";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+    <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-5 lg:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <Button variant="ghost" size="icon" className="shrink-0 md:hidden" onClick={onMenuClick}>
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Open navigation</span>
+        </Button>
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold text-foreground sm:text-xl">{title}</h1>
+          {subtitle && <p className="line-clamp-1 text-xs text-muted-foreground sm:text-sm">{subtitle}</p>}
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
         {/* Search */}
         <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -71,9 +78,9 @@ export function Header({ title, subtitle }: HeaderProps) {
         </Button>
 
         {/* Add Item */}
-        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+        <Button className="gap-2 px-3 sm:px-4" onClick={() => setIsAddDialogOpen(true)}>
           <Plus className="h-4 w-4" />
-          Add Item
+          <span className="hidden sm:inline">Add Item</span>
         </Button>
 
         {/* User Profile Dropdown */}
