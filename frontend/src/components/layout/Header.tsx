@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Bell, Search, Plus, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,12 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ProductDialog } from "@/components/inventory/ProductDialog";
+import { useInventory } from "@/hooks/useInventory";
+import type { InventoryItem } from "@/types/inventory";
+import { toast } from "@/components/ui/use-toast";
+
+type AddProductData = Omit<InventoryItem, "id" | "status" | "lastUpdated" | "createdAt">;
 
 interface HeaderProps {
   title: string;
@@ -21,10 +28,18 @@ interface HeaderProps {
 export function Header({ title, subtitle }: HeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { addItem } = useInventory();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleAddProduct = (productData: AddProductData) => {
+    addItem(productData);
+    setIsAddDialogOpen(false);
+    toast({ title: "Product added", description: `${productData.name} has been added to inventory.` });
   };
 
   const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : "U";
@@ -56,7 +71,7 @@ export function Header({ title, subtitle }: HeaderProps) {
         </Button>
 
         {/* Add Item */}
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           Add Item
         </Button>
@@ -101,6 +116,14 @@ export function Header({ title, subtitle }: HeaderProps) {
           </DropdownMenu>
         )}
       </div>
+
+      {/* Add Product Dialog */}
+      <ProductDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSave={handleAddProduct}
+        mode="add"
+      />
     </header>
   );
 }

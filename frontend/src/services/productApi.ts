@@ -14,6 +14,7 @@ export interface CreateProductRequest {
   category: string;
   quantity: number;
   price: number;
+  cost: number;
   reorderPoint: number;
   supplierId?: string;
   description?: string;

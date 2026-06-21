@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   getInventory,
-  saveInventory,
   addInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
   initializeStorage,
 } from "@/lib/storage";
 import { InventoryItem } from "@/types/inventory";
+import { productApi } from "@/services/productApi";
 
 export function useInventory() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -26,6 +26,17 @@ export function useInventory() {
   const addItem = useCallback((item: Omit<InventoryItem, "id" | "status" | "lastUpdated" | "createdAt">) => {
     const newItem = addInventoryItem(item);
     setInventory(prev => [...prev, newItem]);
+    productApi.create({
+      name: item.name,
+      sku: item.sku,
+      category: item.category,
+      quantity: item.quantity,
+      price: item.price,
+      cost: item.cost,
+      reorderPoint: item.reorderPoint,
+      supplierId: item.supplierId || undefined,
+      description: "",
+    }).catch(() => {});
     return newItem;
   }, []);
 
@@ -34,6 +45,16 @@ export function useInventory() {
     if (updated) {
       setInventory(prev => prev.map(item => item.id === id ? updated : item));
     }
+    productApi.update(id, {
+      name: updated.name,
+      sku: updated.sku,
+      category: updated.category,
+      quantity: updated.quantity,
+      price: updated.price,
+      cost: updated.cost,
+      reorderPoint: updated.reorderPoint,
+      supplierId: updated.supplierId || undefined,
+    }).catch(() => {});
     return updated;
   }, []);
 
@@ -42,6 +63,7 @@ export function useInventory() {
     if (success) {
       setInventory(prev => prev.filter(item => item.id !== id));
     }
+    productApi.delete(id).catch(() => {});
     return success;
   }, []);
 

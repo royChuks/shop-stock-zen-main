@@ -1,19 +1,30 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useInventory } from "@/hooks/useInventory";
 import { useOrders } from "@/hooks/useOrders";
 import { getInventoryStats } from "@/lib/storage";
-import { Download, FileText, BarChart3, Package, DollarSign } from "lucide-react";
+import { Download, FileText, BarChart3, Package, DollarSign, Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { ProductDialog } from "@/components/inventory/ProductDialog";
+import type { InventoryItem } from "@/types/inventory";
+
+type AddProductData = Omit<InventoryItem, "id" | "status" | "lastUpdated" | "createdAt">;
 
 const Reports = () => {
-  const { inventory } = useInventory();
+  const { inventory, addItem } = useInventory();
   const { orders } = useOrders();
   const stats = getInventoryStats();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const generateReport = (type: string) => {
     toast({ title: "Report Generated", description: `${type} report has been generated.` });
+  };
+
+  const handleAddProduct = (productData: AddProductData) => {
+    addItem(productData);
+    toast({ title: "Product added", description: `${productData.name} has been added to inventory.` });
   };
 
   const reports = [
@@ -25,6 +36,13 @@ const Reports = () => {
 
   return (
     <DashboardLayout title="Reports" subtitle="Generate and download inventory reports.">
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-sm text-muted-foreground">Generate and manage inventory reports</p>
+        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add Product
+        </Button>
+      </div>
       <div className="grid gap-6 md:grid-cols-2">
         {reports.map((report) => (
           <Card key={report.title}>
@@ -48,6 +66,14 @@ const Reports = () => {
           </Card>
         ))}
       </div>
+
+      {/* Add Product Dialog */}
+      <ProductDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSave={handleAddProduct}
+        mode="add"
+      />
     </DashboardLayout>
   );
 };

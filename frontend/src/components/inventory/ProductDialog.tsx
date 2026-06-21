@@ -25,12 +25,17 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
     reorderPoint: product?.reorderPoint || 10,
     price: product?.price || 0,
     cost: product?.cost || 0,
+    supplierId: product?.supplierId || "",
     supplier: product?.supplier || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    const selectedSupplier = suppliers.find(s => s.id === formData.supplierId);
+    onSave({
+      ...formData,
+      supplier: selectedSupplier?.name || formData.supplier,
+    });
     onOpenChange(false);
     setFormData({
       name: "",
@@ -40,6 +45,7 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
       reorderPoint: 10,
       price: 0,
       cost: 0,
+      supplierId: "",
       supplier: "",
     });
   };
@@ -94,15 +100,18 @@ export function ProductDialog({ open, onOpenChange, product, onSave, mode }: Pro
             <div className="space-y-2">
               <Label htmlFor="supplier">Supplier</Label>
               <Select
-                value={formData.supplier}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, supplier: value }))}
+                value={formData.supplierId}
+                onValueChange={(value) => {
+                  const s = suppliers.find(s => s.id === value);
+                  setFormData(prev => ({ ...prev, supplierId: value, supplier: s?.name || "" }));
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select supplier" />
                 </SelectTrigger>
                 <SelectContent>
                   {suppliers.map(supplier => (
-                    <SelectItem key={supplier.id} value={supplier.name}>{supplier.name}</SelectItem>
+                    <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

@@ -9,6 +9,7 @@ export interface InventoryItem {
   cost: number;
   status: "healthy" | "low" | "critical";
   supplier: string;
+  supplierId?: string;
   lastUpdated: string;
   createdAt: string;
 }
