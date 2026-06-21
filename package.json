@@ -6,7 +6,7 @@
   "workspaces": ["frontend", "backend"],
   "scripts": {
     "install:all": "npm install",
-    "build": "npm run -w backend prisma:generate && cd frontend && node ../node_modules/vite/bin/vite.js build",
+    "build": "npm run -w backend prisma:generate && npm run -w frontend build",
     "dev:frontend": "npm run -w frontend dev",
     "dev:backend": "npm run -w backend dev",
     "prisma:generate": "npm run -w backend prisma:generate",
@@ -18,8 +18,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "vite": "^5.4.19",
-    "@swc/core-win32-x64-msvc": "1.15.41",
+     "vite": "^5.4.19",
     "effect": "3.18.4",
     "hono": "4.11.4",
     "@prisma/client": "7.3.0",
