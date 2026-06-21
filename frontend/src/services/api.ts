@@ -1,6 +1,23 @@
 import { authService } from "./authService";
 
-const BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api/v1" : "http://localhost:3000/api/v1");
+const LOCAL_API_URL = "http://localhost:3000/api/v1";
+const PRODUCTION_API_URL = "/api/v1";
+
+function resolveApiBaseUrl(): string {
+  const configuredUrl = import.meta.env.VITE_API_URL?.trim();
+
+  if (import.meta.env.PROD) {
+    if (!configuredUrl || configuredUrl.includes("localhost") || configuredUrl.includes("127.0.0.1")) {
+      return PRODUCTION_API_URL;
+    }
+
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  return (configuredUrl || LOCAL_API_URL).replace(/\/$/, "");
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export interface ApiError {
   message: string;
@@ -99,4 +116,4 @@ class ApiClient {
   }
 }
 
-export const api = new ApiClient(BASE_URL);
+export const api = new ApiClient(API_BASE_URL);

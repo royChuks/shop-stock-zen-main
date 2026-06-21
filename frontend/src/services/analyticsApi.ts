@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { API_BASE_URL, api } from "./api";
 
 export interface DashboardStats {
   totalProducts: number;
@@ -83,28 +83,28 @@ export const analyticsApi = {
   },
 
   async downloadInventoryReport(): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"}/analytics/reports/inventory`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/reports/inventory`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     });
     return response.blob();
   },
 
   async downloadLowStockReport(): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"}/analytics/reports/low-stock`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/reports/low-stock`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     });
     return response.blob();
   },
 
   async downloadOrdersReport(): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"}/analytics/reports/orders`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/reports/orders`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     });
     return response.blob();
   },
 
   async downloadFinancialReport(): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"}/analytics/reports/financial`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/reports/financial`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     });
     return response.blob();
